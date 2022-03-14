@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 from models.residual_block import make_basic_block_layer, make_bottleneck_layer
 import keras
-from CAEloss import CAE
+from CAE_train import CAE
 class landmark_only_resnet_50(tf.keras.Model):
     def __init__(self,layer_params=[3,4,6,3]):
         super(landmark_only_resnet_50, self).__init__()
