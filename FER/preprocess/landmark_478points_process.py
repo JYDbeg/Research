@@ -1,46 +1,16 @@
-import imageio
+
 import matplotlib.pyplot as plt
-#from prepare_datafnn import load_and_preprocess_image
 import face_recognition
 names = ["iwata","miymoto","tanaka","nisio"]
 expr=["negative","postive"]
 dir_path = "newdata/postive-"
 import glob
 import numpy as np
-import cv2
 left_eye =[246,7,161,163,160,144,159,145,158,153,157,154,173,155,55,221,222,65,52,223,224,53,225,46]
 right_eye =[398,382,381,384,385,380,386,374,373,387,388,466,390,249,276,445,444,283,282,443,442,295,441,285]
 mouth = [61,185,40,39,37,0,267,259,270,409,291,287,57,375,321,405,314,17,84,181,91,146,76,184,74,73,72,11,302,303,304,408,306,307,320,404,315,16,85,180,90,77,62,183,42,41,38,12,268,271,272,407,292,325,319,403,316,15,86,179,89,96,78,191,80,81,82,13,312,311,310,415,308,324,318,402,317,14,87,178,88,95]
-'''names  =["01","02","03","04","05","06","07","08","09","10","11","12","13","17","19","20","22","23"]
-expr =["hukai","kai","neural"]
-dir_path = "Actor_video/"'''
-
-'''def load_and_preprocess_image(img_path):
-    # read pictures
-    image = imageio.imread(img_path)
-    try:
-        results = extract_face_landmarks(image)
-        if results ==None:
-            face_location = face_recognition.face_locations(image,0,"cnn")
-            for face in face_location:
-                top,right,bottom,left = face
-                image = image[top:bottom,left:right]
-            results = extract_face_landmarks(image)
-        
-        listdata = []
-        poss_mean = results[33]
-        for i in results:
-            listdata.append([np.sqrt((i[0]-poss_mean[0])**2+(i[1]-poss_mean[1])**2),np.arccos((i[0]*poss_mean[0]+i[1]*poss_mean[1])/(np.sqrt(i[0]**2+i[1]**2)
-                                                                                                                                        *np.sqrt(poss_mean[0]**2+poss_mean[1]**2)))])
-        listdata = np.array(listdata)
-        listdata = listdata.flatten()
-                
-    except:
-        return 0'''
-
 import mediapipe as mp
 def load_and_preprocess_image(img_path,face_mode = 0):
-    # read pictures
     image=face_recognition.load_image_file(img_path)
     face = 0
     if face_mode == 1:
@@ -112,17 +82,6 @@ for name in names:
             index = expr.index(ex)
             lis.append(kekka)
             target.append(index)
-            #if not os.path.exists(f"newdata/landmark/{name}/{ex}"):
-            #    os.makedirs(f"newdata/landmark/{name}/{ex}/")
-          #  imageio.imwrite(f"newdata/landmark/{name}/{ex}/{count}.jpg",kekka)
-            #count+=1
-        
         print(ex,name,len(lis))
-    np.savez(dir_path+name+"-distance-nonormal-landmarks",lis,target)
-
-            
-'''iwata = np.load('newdata/postive-iwatalandmarks.npz')
-miymoto = np.load('newdata/postive-miymotolandmarks.npz')
-tanaka = np.load('newdata/postive-tanakalandmarks.npz')
-nisio = np.load('newdata/postive-nisiolandmarks.npz')
-print(len(nisio["arr_0"]))'''
+    np.savez(dir_path+name+"-distance-nonormal-landmarks",lis,target
+           
