@@ -1,16 +1,11 @@
-import tensorflow as tf
-import config
 import numpy as np
-import matplotlib.pyplot as plt
-import math
-import glob
 from keras.layers import Input,Dense,BatchNormalization,Conv2D,SeparableConv2D,MaxPool2D,GlobalAveragePooling2D,add
 from keras.layers.core import Activation
 from keras.models import Model
 def Xception():
         inputs = Input(shape=(1291, 6, 1))
 
-        # entry flow
+
 
         x = Conv2D(32, (3,3), strides=2, padding='same')(inputs)
         x = BatchNormalization()(x)
