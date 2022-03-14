@@ -104,15 +104,10 @@ if __name__ == '__main__':
         file =f"newdata/postive-{name}-landmarks.npz"
         if name in validname:
             data =  np.load(file)
-
-            #valid_data = np.concatenate([valid_data,data["arr_0"]],axis=0)
-            #v_targets= np.concatenate([v_targets,data["arr_1"]])
             index_z = np.where(data["arr_1"] == 2)
             zero_v=np.concatenate([zero_v,data["arr_0"][index_z[0][0]:index_z[0][-1]]],axis=0)
             continue
         data =  np.load(file)
-        #datasets=np.concatenate([datasets,data["arr_0"]],axis=0)
-        #targets=np.concatenate([targets,data["arr_1"]])
         index_z = np.where(data["arr_1"] == 2)
         zero_train=np.concatenate([zero_train,data["arr_0"][index_z[0][0]:index_z[0][-1]]],axis=0)
     zero_train = zero_train.reshape((len(zero_train),478,2,1))
