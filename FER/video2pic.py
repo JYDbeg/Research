@@ -16,12 +16,10 @@ emotion_insenty = ["01","02"]
 state =["01","02"]
 repe =["01","02"]
 actor  =["01","02","03","04","05","06","07","08","09","10","11","12","13","17","19","20","22","23"]
-def save_all_frames(video_path, dir_path, basename, ext='jpg'):
+def save_frames(video_path, dir_path, basename, ext='jpg'):
     cap = cv2.VideoCapture(video_path)
-
     if not cap.isOpened():
         return
-
     os.makedirs(dir_path, exist_ok=True)
     base_path = os.path.join(dir_path, basename)
 
@@ -46,14 +44,8 @@ for ac in actor:
                         file=f"test/Video_Song_Actor_{ac}/Actor_{ac}/02-{vol}-{emo}-{e_i}-{s}-{r}-{ac}.mp4"
                         count +=1
                         if emo in neural:
-                            save_all_frames(file, f"Actor_video/{ac}/neural", f'{count}')
+                            save_frames(file, f"Actor_video/{ac}/neural", f'{count}')
                         elif emo in negative:
-                            save_all_frames(file, f"Actor_video/{ac}/hukai", f'{count}')
+                            save_frames(file, f"Actor_video/{ac}/hukai", f'{count}')
                         elif emo in positive:
-                            save_all_frames(file, f"Actor_video/{ac}/kai", f'{count}')
-'''for name in names:
-    for an in ang:
-        for ex in expr:
-            for file in glob.glob(f"{path}{name}/*{ex}{an}.mp4"):
-                count +=1
-                save_all_frames(file, f"ha_alll/{name}/{ex}", f'{count}')'''
+                            save_frames(file, f"Actor_video/{ac}/kai", f'{count}')
