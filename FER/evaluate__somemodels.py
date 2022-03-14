@@ -335,8 +335,8 @@ def valid_step_image(images, labels):
 valid_names = ["iwata"]
 result_train_accuracy = []
 result_all_accuracy = []
-modesss = [2]
-for mode in modesss:
+modes = [2]
+for mode in modes:
     if mode == 0:
         model = model_face_only
         train_dataset,valid_dataset,train_count,valid_count = dataprepare(names,valid_names,expr,mode)
@@ -457,19 +457,6 @@ for mode in modesss:
                                                                     valid_accuracy.result()))
             result_all_accuracy.append(valid_accuracy.result().numpy())
             result_train_accuracy.append(train_accuracy.result().numpy())
-        '''fig = plt.figure()
-        plt.plot(range(config.EPOCHS), result_train_accuracy,label="train_accuracy")
-        plt.plot(range(config.EPOCHS), result_all_accuracy,label="valid_accuracy")
-        plt.xlabel("epoch")
-        plt.ylabel("accuracy")
-
-        plt.legend()
-        fig.savefig(f"{valid_names}{mode}res6distanceresorvoir.png")
-        print(result_all_accuracy)
-        f = open('test.txt', 'a', encoding='UTF-8')
-
-        f.write(str(np.max(result_all_accuracy))+"\n")
-        f.close()'''
         model.save_weights(filepath="loss_train/target/model_3", save_format='tf')
     if mode ==3:
         
