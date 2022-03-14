@@ -1,9 +1,7 @@
-import numpy as np
 from keras.preprocessing import image
 import glob
-from matplotlib import pyplot as plt
-from PIL import Image
 import tensorflow as tf
+#画像の明るさ或いはコントラストをランダムに変更する
 names=["f01","f02","f03","m01","m02","m03"]
 labels = ["happiness","neural"]
 
@@ -18,9 +16,5 @@ for name in names:
         for file in glob.glob(f"ha_j/{name}/{label}/onlyface/*.jpg"):
             img = tf.io.read_file(file)
             img = tf.image.decode_jpeg(img,3)
-            #x =tf.image.resize(img,(224,224))/255.0 
-            #a = np.sum(x,axis=2)>2.8
-            #a= np.stack([a,a,a],axis=2)
-            #x = x-a
             for i in range(200):
                 data_agumention(img,i+1)
