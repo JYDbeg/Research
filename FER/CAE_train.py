@@ -1,18 +1,8 @@
-from re import S
 import tensorflow as tf
 import config
 import numpy as np
-import time
-import matplotlib.pyplot as plt
 import math
-import glob
-from multimodal import multimodalnn
-from models.residual_block import make_basic_block_layer, make_bottleneck_layer
-from keras.layers import Input,Dense,BatchNormalization,Conv2D,SeparableConv2D,MaxPool2D,UpSampling2D
-from keras.models import Sequential
-from prepare_data import load_and_preprocess_image
-from sklearn.model_selection import train_test_split
-import keras
+
 class CAE(tf.keras.Model):
         def __init__(self):
             super(CAE, self).__init__()
@@ -137,6 +127,7 @@ if __name__ == '__main__':
     valid_count = len(zero_v)
     train_dataset = train_dataset.shuffle(buffer_size=train_count).batch(batch_size=config.BATCH_SIZE)
     valid_dataset = valid_dataset.batch(batch_size=config.BATCH_SIZE)
+    epochs = 60
     @tf.function
     def train_step_image(images, labels):
         with tf.GradientTape() as tape:
@@ -155,7 +146,7 @@ if __name__ == '__main__':
 
         valid_loss(v_loss)
         valid_accuracy(labels, predictions)   
-    for epoch in range(60):
+    for epoch in range(epochs):
                 train_loss.reset_states()
                 train_accuracy.reset_states()
                 valid_loss.reset_states()
@@ -165,7 +156,7 @@ if __name__ == '__main__':
                     step += 1
                     train_step_image(image, labels)
                     print("Epoch: {}/{}, step: {}/{}, loss: {:.5f}, accuracy: {:.5f}".format(epoch + 1,
-                                                                                            60,
+                                                                                            epochs,
                                                                                             step,
                                                                                             math.ceil(train_count / config.BATCH_SIZE),
                                                                                             train_loss.result(),
