@@ -7,15 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1WCGO9GYQJAFCc2mDeKvoXoFb1Kosw1en
 """
 
-!tar -xvf "/content/drive/MyDrive/train_set.tar" -C "/content/train_data/"
-
-!tar -xvf "/content/drive/MyDrive/val_set.tar" -C "/content/train_data/"
-
-#!unrar x "/content/drive/MyDrive/val_class.rar" "/content/train_data/val_class/"
-#!unrar x "/content/drive/MyDrive/train_class.rar" "/content/train_data/train_class/"
-
-!pip install timm
-!pip install mediapipe
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -117,27 +108,25 @@ class Traindataset(torch.utils.data.Dataset):
 
 from pathlib import Path
 import glob
-p_1 = "/content/train_data/train_set/images/*.jpg"
-p_2 = "/content/train_data/train_set/annotations/"
-p_3 = "/content/train_data/val_set/images/*.jpg"
-p_4 = "/content/train_data/val_set/annotations/"
+train_data = "/content/train_data/train_set/images/*.jpg"
+train_ano = "/content/train_data/train_set/annotations/"
+valid_data = "/content/train_data/val_set/images/*.jpg"
+valid_ano = "/content/train_data/val_set/annotations/"
 paths = []
 v_paths = []
 a_paths = []
-f_c = []
-n_c = []
-o_c =[]
-t_c = []
-for file in tqdm(glob.glob(p_1)):
+four_c = []
+nine_c = []
+onehundred_c =[]
+twelve_c = []
+for file in tqdm(glob.glob(train_data)):
 
     file_name = Path(file).stem
-    #data = np.array(Image.open(file))
-    v = np.load(p_2+file_name+"_val.npy",allow_pickle =1)
-    a = np.load(p_2+file_name+"_aro.npy",allow_pickle =1)
+    v = np.load(train_ano+file_name+"_val.npy",allow_pickle =1)
+    a = np.load(train_ano+file_name+"_aro.npy",allow_pickle =1)
     
     if v == -2 or a==-2:
         continue
-    #va = np.array([v,a])
     paths.append(f"/content/train_data/train_set/images/{file_name}.jpg")
     v_paths.append(f"/content/train_data/train_set/annotations/{file_name}_val.npy")
     a_paths.append(f"/content/train_data/train_set/annotations/{file_name}_aro.npy")
@@ -145,11 +134,7 @@ for file in tqdm(glob.glob(p_1)):
     n_c.append(f"/content/train_data/train_class/class/{file_name}_n.npy")
     o_c.append(f"/content/train_data/train_class/class/{file_name}_o.npy")
     t_c.append(f"/content/train_data/train_class/class/{file_name}_t.npy")'''
-    #save_data = {file_name:{"img":data,"va":va}}
-    #save_datas.update(**save_data)
-#np.savez_compressed("E:/affecttraindata",**save_datas)
-#sava_datas = {}
-#test_data = {}
+ 
 vpaths = []
 vv_paths = []
 va_paths = []
@@ -157,11 +142,11 @@ vf_c = []
 vn_c = []
 vo_c =[]
 vt_c = []
-for file in tqdm(glob.glob(p_3)):
+for file in tqdm(glob.glob(valid_data)):
     file_name = Path(file).stem
     #data = np.array(Image.open(file))
-    v = np.load(p_4+file_name+"_val.npy",allow_pickle =1)
-    a = np.load(p_4+file_name+"_aro.npy",allow_pickle =1)
+    v = np.load(valid_ano+file_name+"_val.npy",allow_pickle =1)
+    a = np.load(valid_ano+file_name+"_aro.npy",allow_pickle =1)
     if v == -2 or a==-2:
         continue
     vpaths.append(f"/content/train_data/val_set/images/{file_name}.jpg")
@@ -190,7 +175,7 @@ if isTrained:
   for layer in last_layer:
       for param in layer.parameters():
           param.requires_grad = True
-  model.head = nn.Sequential(nn.Linear(512,250),nn.ReLU(),nn.Linear(250,12))
+  model.head = nn.Sequential(nn.Linear(512,250),nn.ReLU(),nn.Linear(250,100))
   model.load_state_dict(check_point)
 else:
   check_point =torch.load("/content/drive/MyDrive/poolformer_s12.pth.tar")
@@ -201,13 +186,13 @@ else:
   for layer in last_layer:
       for param in layer.parameters():
           param.requires_grad = True
-  model.head = nn.Sequential(nn.Linear(512,250),nn.ReLU(),nn.Linear(250,2),nn.Identity())#,nn.Tanh()
+  model.head = nn.Sequential(nn.Linear(512,250),nn.ReLU(),nn.Linear(250,2),nn.Identity())#nn.Tanh()
 #weight = torch.tensor([287651/27792,287651/109927,287651/6542, 287651/16033,287651/50027,287651/7445,287651/35104,287651/15774,287651/19007]).cuda()
 class PercentLoss(nn.Module):
-    def __init__(self): # パラメータの設定など初期化処理を行う
+    def __init__(self): 
         super(PercentLoss, self).__init__()
 
-    def forward(self, outputs, targets): # モデルの出力と正解データ
+    def forward(self, outputs, targets): 
 
         loss = torch.sum(torch.abs(targets-outputs)/targets)
         return loss
