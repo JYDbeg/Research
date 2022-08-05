@@ -11,7 +11,7 @@ import face_recognition
 import torch
 import torch.nn as nn
 
-#from PIL import ImageFont, ImageDraw, Image
+
 import numpy as np
 from poolformer import poolformer_s12
 from pytorch_grad_cam import XGradCAM
@@ -30,10 +30,10 @@ face_detection =mp_face_detection.FaceDetection(
 freqs_min = 0.8
 freqs_max = 1.8
 ecg_mask = np.zeros([100,100,3],dtype=np.uint8)
-#mp_drawing = mp.solutions.drawing_utils
-#mp_drawing_styles = mp.solutions.drawing_styles
-#mp_face_mesh = mp.solutions.face_mesh
-#drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
+mp_face_mesh = mp.solutions.face_mesh
+drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 def get_hr(ROI, fps):
     signal_handler = Handler(ROI)
     blue, green, red = signal_handler.get_channel_signal()
@@ -49,15 +49,13 @@ def get_hr(ROI, fps):
 
 model = poolformer_s12()
 model.head = nn.Sequential(nn.Linear(512,250),nn.ReLU(),nn.Linear(250,2))
-
-#model.head = nn.Sequential(nn.Linear(512,250),nn.ReLU(),nn.Linear(250,12))
 model.load_state_dict(torch.load("myFirstModel.pth"))
 
-#use_camera = int(input("choose your camera ID:"))
-cap_file = cv2.VideoCapture("01-02-06-01-01-01-04.mp4")
+use_camera = int(input("choose your camera ID:"))
+cap_file = cv2.VideoCapture(use_camera)
 fps = cap_file.get(cv2.CAP_PROP_FPS)
 fourcc = cv2.VideoWriter_fourcc('m','p','4', 'v') 
-#out = cv2.VideoWriter('edited_video.mp4', fourcc, fps,(640,480)) 
+out = cv2.VideoWriter('video.mp4', fourcc, fps,(640,480)) 
 
 
 wakuface = cv2.imread("waku1.png",-1)
@@ -93,11 +91,11 @@ heartrates = []
 for i in range(301):
     heartrates.append((i,250))
 heartrates =np.array(heartrates)
-'''face_mesh =mp_face_mesh.FaceMesh(
+face_mesh =mp_face_mesh.FaceMesh(
     max_num_faces=1,
     refine_landmarks=True,
     min_detection_confidence=0.5,
-    min_tracking_confidence=0.5)'''
+    min_tracking_confidence=0.5)
 while cap_file.isOpened():
     ret, frame =cap_file.read()
     if not ret:
@@ -107,7 +105,6 @@ while cap_file.isOpened():
     facetodetect = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     frames.append(facetodetect)
     facetodetectcopy = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    #facetodetectgcam = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     face_location = face_recognition.face_locations(facetodetect,0,"cnn")
     
     if not len(face_location):
@@ -115,14 +112,6 @@ while cap_file.isOpened():
     for face in face_location:
         top,right,bottom,left = face
         face = facetodetect[top:bottom+20,left:right]
-    #dects = detector(frame)
-    #if not len(dects):
-    #    continue
-    #for face in dects:
-        #left = face.left()
-        #right = face.right()
-        #top = face.top()
-        #bottom = face.bottom()
         h = bottom - top
         w = right - left
         
@@ -142,11 +131,9 @@ while cap_file.isOpened():
     wf = 235-w
     hhf = int(0.5*hf)
     hwf = int(0.5*wf)
-    #face = facetodetect[top:bottom,left:right]
-    #facey = bottom-top
-    #facex = right-left
+    
     f = facetodetect[max(0,top-hhf):bottom+hhf,max(0,left-hwf):right+hwf]
-    '''results = face_mesh.process(facetodetectcopy)
+    results = face_mesh.process(facetodetectcopy)
     if results.multi_face_landmarks:
         for face_landmarks in results.multi_face_landmarks:
             mp_drawing.draw_landmarks(
@@ -155,7 +142,7 @@ while cap_file.isOpened():
             connections=mp_face_mesh.FACEMESH_TESSELATION,
             landmark_drawing_spec=None,
             connection_drawing_spec=mp_drawing_styles
-            .get_default_face_mesh_tesselation_style())'''
+            .get_default_face_mesh_tesselation_style())
     lm = facetodetectcopy[top:bottom,left:right]
     lm = cv2.resize(lm,(150,150))
     face = cv2.resize(face,(224,224))
@@ -168,13 +155,11 @@ while cap_file.isOpened():
     with torch.no_grad():
         data = face_.to(device)
         outputs = model(data).to('cpu').detach().numpy().copy()
-    #print(outputs)
     '''if "heartrate"  in locals():
         if heartrate>80:
             outputs[6:] = outputs[6:]*100
         else:
             outputs[:6] = outputs[:6]*100'''
-    #outputs = np.argmax(outputs)
     valence = outputs[0][0]
     arousal = outputs[0][1]
     target= [ClassifierOutputTarget(0)]
@@ -212,10 +197,6 @@ while cap_file.isOpened():
         emotion_stress = min(max_emotion_stress,emotion_stress)
     wariai = emotion_stress/max_emotion_stress
     x = wariai*co
-    #frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-    #frame[:720,:1280] = frame[:720,:1280] *(1-wakuoo[:,:,3:]/255)+wakuoo[:,:,:3]*(wakuoo[:,:,3:]/255)
-    #frame[:720,:1280] = frame[:720,:1280] *(1-wakuver2[:,:,3:]/255)+wakuver2[:,:,:3]*(wakuver2[:,:,3:]/255)
-    #face = cv2.cvtColor(face,cv2.COLOR_RGB2BGR)
     f = cv2.cvtColor(f,cv2.COLOR_RGB2BGR)
     lm = cv2.cvtColor(lm,cv2.COLOR_RGB2BGR)
     frame[:480,:640] = [0,0,0]
@@ -240,7 +221,6 @@ while cap_file.isOpened():
             fade = 1
             alpha = 1
         frame[:100,:100] = cv2.addWeighted(frame[:100,:100],alpha,ecg_mask,1-alpha,0)
-    #frame[:100,int(count_f*5/3):int(count_f*5/3)+2] = [0,0,0]
     frame[3:3+f_y,400:400+f_x] = f
     frame[3:3+l_y,250:250+l_x] = lm
     frame[386:422,361+int(x):577] = [0,0,0]
@@ -266,14 +246,6 @@ while cap_file.isOpened():
             thickness=2,
             lineType=cv2.LINE_4)
 
-                        #draw.text((le,t-90),f"判定結果:"+str(class_name[np.argmax(result,axis=1)[0]]),font=title_font,fill=(250,110,100))
-    #frame[:720,:1280] = frame[:720,:1280] *(1-bar[:,:,3:]/255)+bar[:,:,:3]*(bar[:,:,3:]/255)
-    #frame[:720,:1280] = frame[:720,:1280] *(1-barb[:,:,3:]/255)+barb[:,:,:3]*(barb[:,:,3:]/255)
-    #frame[50:150,50:150]=frame[50:150,50:150]*(1-waku[:,:,3:]/255)+waku[:,:,:3]*(waku[:,:,3:]/255)
-    #index = np.random.randint(0,9)
-    #px = zahyoux[index]
-    #index = np.random.randint(0,9)
-    #py = zahyouy[index]
     diffx = x_-last[1]
     diffy = y_-last[0]
     multix = diffx/5
@@ -296,25 +268,15 @@ while cap_file.isOpened():
         hyougazo = cv2.imread(hyoujo[4]+".png",-1)
         frame[360:460,20:120] = frame[360:460,20:120] = frame[360:460,20:120] *(1-hyougazo[:,:,3:]/255)+hyougazo[:,:,:3]*(hyougazo[:,:,3:]/255)
     last= [int(last[0]+multiy),int(last[1]+multix)]
-    #cv2.putText(frame, '{:.1f}bpm'.format(bpm), (200, 380), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)
     cv2.putText(frame, '{:.1f}bpm'.format(heartrate), (200, 380), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)
     cv2.putText(frame, '{:.1f}fps'.format(fps), (200, 420), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)
     frame[last[0]:last[0]+20,last[1]:last[1]+20]=frame[last[0]:last[0]+20,last[1]:last[1]+20]*(1-pointbig[:,:,3:]/255)+pointbig[:,:,:3]*(pointbig[:,:,3:]/255)
     cv2.rectangle(frame,(40,290),(170,470),(88,77,155),2)
-    #frame = cv2.cvtColor(frame,cv2.COLOR_RGB2BGR)
-    #frame_rgb = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-    #pil_image = Image.fromarray(frame_rgb)
-    #draw = ImageDraw.Draw(pil_image)
-    #draw.text((100,100),f'valence={b},arousal={a}',font=title_font,fill=(255,0,0))
-    #draw.text((100,200),f'positive : valence<2 negative : valence>=2',font=title_font,fill=(255,0,0))
-    #draw.text((100,300),f'適当に作った',font=title_font,fill=(255,0,0))
-    #rgb_image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
     if len(ROI) == 299:
         heartrates[:,0]-=1
         heartrates[:-1] = heartrates[1:]
-        #print(heartrates)
         cv2.polylines(frame,[heartrates], False, (255,0, 0))
-    #out.write(frame)
+    out.write(frame)
     count_f += heartrate/50
     count_f= count_f%60
     cv2.imshow("v",frame)
@@ -322,5 +284,5 @@ while cap_file.isOpened():
         break
 
 cap_file.release()
-#out.release()
+out.release()
 cv2.destroyAllWindows()
