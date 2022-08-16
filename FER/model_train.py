@@ -115,10 +115,7 @@ valid_ano = "/content/train_data/val_set/annotations/"
 paths = []
 v_paths = []
 a_paths = []
-four_c = []
-nine_c = []
-onehundred_c =[]
-twelve_c = []
+
 for file in tqdm(glob.glob(train_data)):
 
     file_name = Path(file).stem
@@ -130,18 +127,11 @@ for file in tqdm(glob.glob(train_data)):
     paths.append(f"/content/train_data/train_set/images/{file_name}.jpg")
     v_paths.append(f"/content/train_data/train_set/annotations/{file_name}_val.npy")
     a_paths.append(f"/content/train_data/train_set/annotations/{file_name}_aro.npy")
-    '''f_c.append(f"/content/train_data/train_class/class/{file_name}_f.npy")
-    n_c.append(f"/content/train_data/train_class/class/{file_name}_n.npy")
-    o_c.append(f"/content/train_data/train_class/class/{file_name}_o.npy")
-    t_c.append(f"/content/train_data/train_class/class/{file_name}_t.npy")'''
  
 vpaths = []
 vv_paths = []
 va_paths = []
-vf_c = []
-vn_c = []
-vo_c =[]
-vt_c = []
+
 for file in tqdm(glob.glob(valid_data)):
     file_name = Path(file).stem
     #data = np.array(Image.open(file))
@@ -152,10 +142,7 @@ for file in tqdm(glob.glob(valid_data)):
     vpaths.append(f"/content/train_data/val_set/images/{file_name}.jpg")
     vv_paths.append(f"/content/train_data/val_set/annotations/{file_name}_val.npy")
     va_paths.append(f"/content/train_data/val_set/annotations/{file_name}_aro.npy")
-    '''vf_c.append(f"/content/train_data/val_class/class/{file_name}_f.npy")
-    vn_c.append(f"/content/train_data/val_class/class/{file_name}_n.npy")
-    vo_c.append(f"/content/train_data/val_class/class/{file_name}_o.npy")
-    vt_c.append(f"/content/train_data/val_class/class/{file_name}_t.npy")'''
+
 
 traindataset =pathdataset(paths,v_paths,a_paths)
 #traindataset =Traindataset(paths,t_c)
@@ -166,7 +153,7 @@ dataloader = torch.utils.data.DataLoader(traindataset,batch_size= 128 ,shuffle =
 v_dataloader = torch.utils.data.DataLoader(valdataset,batch_size = 128,shuffle = False,num_workers=0)
 
 model = poolformer_s12()
-isTrained = 0
+isTrained = int(input("is trained?:1 or 0"))
 if isTrained:
   check_point = torch.load("/content/drive/MyDrive/myOneHundredClassModel.pth")
   for param in model.parameters():
@@ -248,4 +235,4 @@ for epoch in range(10000):
         print ('Epoch [{}/{}], loss: {loss:.4f} val_loss: {val_loss:.4f},' 
                 .format(epoch+1, 10000, i+1, loss=avg_train_loss, val_loss=avg_val_loss))
 
-!nvidia-smi
+
